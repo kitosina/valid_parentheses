@@ -1,5 +1,3 @@
-import java.util.Stack;
-
 public class Main {
     /**
      * Найти валидные круглые скобки.
@@ -25,22 +23,51 @@ public class Main {
         System.out.println(countValidParentheses(")()())"));
         System.out.println(countValidParentheses(")(()())"));
         System.out.println(countValidParentheses(")("));
-
     }
 
-    public static int countValidParentheses(String s) {
-        char[] arrChar = s == null ? new char[]{} : s.toCharArray();
-        Stack<Character> stack = new Stack<>();
-        int count = 0;
-        for (char c : arrChar) {
-            if (c == '(') {
-                stack.push('(');
-            } else if (c == ')') {
-                if (!stack.isEmpty() && stack.pop() != c) {
-                    count = count + 2;
+    public static String countValidParentheses(String s) {
+        final char OPEN_BRACKET = '(';
+        final char CLOSE_BRACKET = ')';
+
+        char[] arrChar = s == null ? new char[]{} : s.trim().toCharArray();
+        int countWaitCloseBracket = 0;
+        int countIncorrectCloseBracket = 0;
+        int countValidParentheses = 0;
+        int startIndexToDelete = 0;
+
+        StringBuilder res = new StringBuilder();
+
+        for (int i = 0; i < arrChar.length; i++) {
+            switch (arrChar[i]) {
+                case OPEN_BRACKET -> {
+                    res.append(OPEN_BRACKET);
+                    if (countWaitCloseBracket == 0) {
+                        startIndexToDelete = i;
+                    }
+                    countWaitCloseBracket++;
+                }
+                case CLOSE_BRACKET -> {
+                    if (countWaitCloseBracket > 0) {
+                        res.append(CLOSE_BRACKET);
+                        countWaitCloseBracket--;
+                        countValidParentheses +=2;
+                    } else {
+                        countIncorrectCloseBracket++;
+                    }
+                }
+                default -> {
+                    throw new IllegalArgumentException("Incorrect format lines");
                 }
             }
         }
-        return count;
+
+        if (countWaitCloseBracket > 0) {
+            res.replace(
+                    startIndexToDelete - countIncorrectCloseBracket,
+                    startIndexToDelete + countWaitCloseBracket - countIncorrectCloseBracket,
+                    ""
+            );
+        }
+        return countValidParentheses == 0 ? "0" : countValidParentheses + "-" + res;
     }
 }
